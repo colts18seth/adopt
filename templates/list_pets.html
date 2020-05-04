@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<h1 class="display-1 text-center">Pets</h1>
+{% endblock %}
+
+
+{% block content %}
+<div class="container row">
+    {% for pet in pets %}
+
+    <div class="card col m-3" style="width: 250px;">
+        <img src="{{ pet.photo_url }}" class="card-img-top" alt="animal photo">
+        <div class="card-body">
+            <p class="card-text">Name: {{ pet.name }}</p>
+            <p class="card-text">Species: {{ pet.species }}</p>
+            {% if pet.age %}
+            <p class="card-text">Age: {{ pet.age }}</p>
+            {% endif %}
+            {% if pet.notes %}
+            <p class="card-text">Notes: {{ pet.notes }}</p>
+            {% endif %}
+            {% if pet.available %}
+            <p class="card-text"><strong>{{ pet.name }} is available!</strong></p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    <div class="container row">
+        <a href="/add"><button class="m-5 btn btn-info d-block" type="button">Add Pet</button></a>
+    </div>
+</div>
+{% endblock %}
