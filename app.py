@@ -1,7 +1,7 @@
 from flask import Flask, request, redirect, render_template
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, Pet
-from forms import PetForm
+from forms import AddPetForm, EditPetForm
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///adopt'
@@ -14,16 +14,18 @@ debug = DebugToolbarExtension(app)
 connect_db(app)
 db.create_all()
 
+
 @app.route("/")
 def list_pets_route():
     """List Pets"""
     pets = Pet.query.all()
     return render_template("list_pets.html", pets=pets)
 
+
 @app.route("/add", methods=["GET", "POST"])
 def add_pet_route():
     """ Add new pet """
-    form = PetForm()
+    form = AddPetForm()
 
     if form.validate_on_submit():
         name = form.name.data
@@ -41,13 +43,31 @@ def add_pet_route():
     else:
         return render_template("new_pet.html", form=form)
 
-    # images
-    # smart dog -  https://images.unsplash.com/photo-1535930749574-1399327ce78f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60
-    # sad cat - https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60
-    #  dog - https://images.unsplash.com/photo-1503256207526-0d5d80fa2f47?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60
-    # puppy - https://images.unsplash.com/photo-1507146426996-ef05306b995a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60
-    # cat - https://images.unsplash.com/photo-1548366086-7f1b76106622?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60
-    # bird - https://images.unsplash.com/photo-1518794183325-56eed2af11fa?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60
-    # llama - https://images.unsplash.com/photo-1517352551702-336dda93455e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60
-    # hamster - https://images.unsplash.com/photo-1425082661705-1834bfd09dca?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60
-    # rabbit - https://images.unsplash.com/photo-1559214369-a6b1d7919865?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60
+
+@app.route('/<int:pet_id>', methods=['GET', 'POST'])
+def show_edit_route(pet_id):
+    """ Show pet details and Edit """
+
+    pet = Pet.query.get_or_404(pet_id)
+    form = EditPetForm(obj=pet)
+
+    if form.validate_on_submit():
+        pet.photo_url = form.photo_url.data
+        pet.notes = form.notes.data
+        pet.available = form.available.data
+        
+        db.session.commit()
+
+        return redirect(f'/{pet_id}')
+    else:
+        return render_template('show_pet.html', pet=pet)
+
+
+@app.route('/<int:pet_id>/edit')
+def edit_form_route(pet_id):
+    """ Render Edit Form """
+
+    pet = Pet.query.get_or_404(pet_id)
+    form = EditPetForm(obj=pet)
+
+    return render_template('edit_pet.html', form=form, pet=pet)

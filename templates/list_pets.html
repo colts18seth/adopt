@@ -6,28 +6,24 @@
 
 
 {% block content %}
-<div class="container row">
-    {% for pet in pets %}
+<div class="container row d-flex justify-content-center">
 
-    <div class="card col m-3" style="width: 250px;">
-        <img src="{{ pet.photo_url }}" class="card-img-top" alt="animal photo">
-        <div class="card-body">
-            <p class="card-text">Name: {{ pet.name }}</p>
-            <p class="card-text">Species: {{ pet.species }}</p>
-            {% if pet.age %}
-            <p class="card-text">Age: {{ pet.age }}</p>
-            {% endif %}
-            {% if pet.notes %}
-            <p class="card-text">Notes: {{ pet.notes }}</p>
-            {% endif %}
-            {% if pet.available %}
-            <p class="card-text"><strong>{{ pet.name }} is available!</strong></p>
-            {% endif %}
+    {% for pet in pets %}
+    <a href="/{{ pet.id }}" class="card-link p-0 m-1 text-dark">
+        <div class="card col-auto m-2" style="width: 12rem;">
+            <img src="{{ pet.photo_url }}" class="card-img-top" alt="animal photo">
+            <div class="card-body">
+                {% if pet.available %}
+                <p class="card-text"><strong><span class="text-info">{{ pet.name }}</span> is available!</strong></p>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    </a>
     {% endfor %}
+
     <div class="container row">
         <a href="/add"><button class="m-5 btn btn-info d-block" type="button">Add Pet</button></a>
     </div>
+
 </div>
 {% endblock %}
